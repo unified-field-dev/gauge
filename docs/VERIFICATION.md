@@ -55,6 +55,8 @@ permission_request_notifications_integration
 principal_connection_migration_integration
 super_user_scripts_integration
 search_source_dispatch_integration
+manifest_sync_integration
+permission_check_emission_integration
 ```
 
 ```bash
@@ -75,6 +77,8 @@ cargo clippy -p gauge --features ssr \
   --test principal_connection_migration_integration \
   --test super_user_scripts_integration \
   --test search_source_dispatch_integration \
+  --test manifest_sync_integration \
+  --test permission_check_emission_integration \
   -- -D warnings
 cargo clippy -p embedded-gauge-host --all-targets -- -D warnings
 cargo test -p gauge --test workspace_members --test product_surface
@@ -89,7 +93,9 @@ cargo test -p gauge --features ssr \
   --test permission_request_notifications_integration \
   --test principal_connection_migration_integration \
   --test super_user_scripts_integration \
-  --test search_source_dispatch_integration
+  --test search_source_dispatch_integration \
+  --test manifest_sync_integration \
+  --test permission_check_emission_integration
 cargo check -p embedded-gauge-host
 cargo run -p embedded-gauge-host
 RUSTDOCFLAGS="-D rustdoc::broken-intra-doc-links" cargo doc -p gauge --features ssr --no-deps
@@ -103,14 +109,6 @@ Do not run `--all-targets` clippy on `gauge`: older smoke suites
 (`trait_registry_smoke`, `search_registry_integration`) stay outside the primary
 matrix. Clippy CI uses `-- -D warnings` for the scoped targets (workspace deny
 lints still apply).
-
-### Extra local suites (not PR CI)
-
-```bash
-cargo test -p gauge --features ssr \
-  --test manifest_sync_integration \
-  --test permission_check_emission_integration
-```
 
 ### leptos-lints (local; not a CI hard gate)
 

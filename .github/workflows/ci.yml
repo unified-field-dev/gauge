@@ -51,6 +51,8 @@ jobs:
         run: |
           cargo clippy -p gauge --features ssr --lib -- -D warnings
           cargo clippy -p gauge --features ssr \
+            --test manifest_sync_integration \
+            --test permission_check_emission_integration \
             --test permission_domain_contract \
             --test permission_flows_integration \
             --test privacy_authorization_integration \
@@ -78,6 +80,8 @@ jobs:
       - name: cargo test (permission domain contracts)
         run: >
           cargo test -p gauge --features ssr
+          --test manifest_sync_integration
+          --test permission_check_emission_integration
           --test permission_domain_contract
           --test permission_flows_integration
           --test privacy_authorization_integration

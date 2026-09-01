@@ -13,7 +13,7 @@
 
 mod common;
 
-use common::{record_pk_id, seed_user, test_valence};
+use common::{record_pk_id, seed_super_user_group_with_member, seed_user, test_valence};
 use gauge::service;
 use gauge::types::{
     PermissionCreateInput, PermissionDomainCreateInput, PermissionGroupCreateInput,
@@ -23,6 +23,7 @@ use gauge::types::{
 use valence::{Actor, Valence};
 
 struct SeededPermission {
+    system: Valence,
     owner_ctx: Valence,
     outsider_ctx: Valence,
     requestor_ctx: Valence,
@@ -87,6 +88,7 @@ async fn seed_permission_world(permission_name: &str) -> SeededPermission {
     .expect("create permission");
 
     SeededPermission {
+        system,
         owner_ctx,
         outsider_ctx,
         requestor_ctx,
@@ -936,8 +938,8 @@ async fn create_permission_arbitrary_owners_group_rejected_sad() {
 }
 
 #[tokio::test]
-async fn permission_detail_omits_allow_list_for_outsider_sad() {
-    let world = seed_permission_world("AllowListOmit").await;
+async fn permission_detail_allow_list_editor_matrix() {
+    let world = seed_permission_world("AllowListMatrix").await;
     service::grant_permission_to_user(&world.permission_id, "requestor", &world.owner_ctx)
         .await
         .expect("grant for allow-list");
@@ -963,6 +965,45 @@ async fn permission_detail_omits_allow_list_for_outsider_sad() {
             .any(|entry| entry.id == "requestor"),
         "owner must see requestor in allow_list; got {:?}",
         owner_detail.allow_list
+    );
+
+    seed_user("coowner", "coowner@example.com", &world.system).await;
+    service::add_group_owner_user(&world.group_id, "coowner", &world.owner_ctx)
+        .await
+        .expect("add co-owner to owners group");
+    let coowner_ctx = world.system.with_actor(Actor::User {
+        user_id: "coowner".to_string(),
+    });
+    let coowner_detail = service::get_permission_detail(&world.permission_id, &coowner_ctx)
+        .await
+        .expect("coowner read")
+        .expect("permission exists");
+    assert!(
+        coowner_detail
+            .allow_list
+            .iter()
+            .any(|entry| entry.id == "requestor"),
+        "owners-group co-owner must see grant graph; got {:?}",
+        coowner_detail.allow_list
+    );
+
+    let su = "super_allow_list";
+    seed_user(su, "super_allow_list@example.com", &world.system).await;
+    seed_super_user_group_with_member(&world.system, su).await;
+    let su_ctx = world.system.with_actor(Actor::User {
+        user_id: su.to_string(),
+    });
+    let su_detail = service::get_permission_detail(&world.permission_id, &su_ctx)
+        .await
+        .expect("super user read")
+        .expect("permission exists");
+    assert!(
+        su_detail
+            .allow_list
+            .iter()
+            .any(|entry| entry.id == "requestor"),
+        "Super User must see grant graph; got {:?}",
+        su_detail.allow_list
     );
 }
 

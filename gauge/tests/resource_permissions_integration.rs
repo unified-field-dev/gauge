@@ -537,6 +537,159 @@ async fn delete_resource_permission_bundle_tears_down_and_is_idempotent() -> any
 }
 
 #[tokio::test]
+async fn resource_permission_list_browsable_for_outsider_happy() -> anyhow::Result<()> {
+    let system = system_valence().await;
+    seed_gluon_catalog(&system).await?;
+
+    let maintainer = "maint_list";
+    seed_user(maintainer, "maint_list@example.test", &system).await;
+    let bundle = ensure_resource_permission_bundle(
+        &system,
+        ResourcePermissionSpec {
+            kind: ResourceKind::GluonApp,
+            resource_id: "app-list".into(),
+            display_name: "Listable App".into(),
+            actions: vec![ResourceAction::View],
+            maintainer_actor: maintainer.into(),
+        },
+    )
+    .await?;
+    let view = bundle.name_for(ResourceAction::View).unwrap().to_string();
+
+    let outsider = "outsider_list";
+    seed_user(outsider, "outsider_list@example.test", &system).await;
+    let ov = user_valence(&system, outsider);
+
+    let listed = service::list_permissions(&ov, Some(view.clone())).await?;
+    let row = listed
+        .iter()
+        .find(|d| d.name == view)
+        .expect("outsider must see resource permission in list");
+    assert!(
+        row.description.contains("Listable"),
+        "listed row must include description; got {:?}",
+        row.description
+    );
+    assert!(
+        row.allow_list.is_empty(),
+        "outsider list row must omit grant graph; got {:?}",
+        row.allow_list
+    );
+    assert!(
+        !service::actor_can(&ov, &view).await?,
+        "outsider must not act on listed permission"
+    );
+    Ok(())
+}
+
+#[tokio::test]
+async fn actor_can_raw_deep_nest_allows_with_bounded_reads() -> anyhow::Result<()> {
+    const DEPTH: usize = 5;
+    /// Super-user probe + permission query + principals + nested group hops.
+    const RAW_READ_CEILING: usize = 64;
+
+    let system = system_valence().await;
+    seed_gluon_catalog(&system).await?;
+
+    let maintainer = "maint_nest";
+    seed_user(maintainer, "maint_nest@example.test", &system).await;
+    let member = "nest_member";
+    seed_user(member, "nest_member@example.test", &system).await;
+
+    let bundle = ensure_resource_permission_bundle(
+        &system,
+        ResourcePermissionSpec {
+            kind: ResourceKind::GluonApp,
+            resource_id: "app-nest".into(),
+            display_name: "Nest".into(),
+            actions: vec![ResourceAction::View],
+            maintainer_actor: maintainer.into(),
+        },
+    )
+    .await?;
+    let view = bundle.name_for(ResourceAction::View).unwrap().to_string();
+
+    let mut groups = Vec::with_capacity(DEPTH);
+    for i in 0..DEPTH {
+        let gid = format!("nest_g{i}");
+        let g = gauge::generated::PermissionGroup::upsert(
+            &gid,
+            gauge::generated::PermissionGroup::new(
+                format!("Nest {i}"),
+                None,
+                chrono::Utc::now(),
+                chrono::Utc::now(),
+            )?,
+            &system,
+        )
+        .await?;
+        groups.push(g);
+    }
+
+    for i in 0..DEPTH - 1 {
+        let child_principal = gauge::generated::PermissionGroupPrincipal::upsert(
+            &format!("permission_group:nest_g{}", i + 1),
+            gauge::generated::PermissionGroupPrincipal::new(
+                groups[i + 1].id().expect("id").clone(),
+                format!("nest_g{}", i + 1),
+            )?,
+            &system,
+        )
+        .await?;
+        groups[i]
+            .relate_to_member_record(child_principal.id().expect("pid"), &system)
+            .await?;
+    }
+
+    let member_user = lepton::generated::User::get(member, &system)
+        .await?
+        .expect("member");
+    let member_principal = gauge::generated::PermissionUserPrincipal::upsert(
+        &format!("user:{member}"),
+        gauge::generated::PermissionUserPrincipal::new(
+            member_user.id().expect("id").clone(),
+            member.to_string(),
+        )?,
+        &system,
+    )
+    .await?;
+    groups[DEPTH - 1]
+        .relate_to_member_record(member_principal.id().expect("pid"), &system)
+        .await?;
+
+    let outer_principal = gauge::generated::PermissionGroupPrincipal::upsert(
+        "permission_group:nest_g0",
+        gauge::generated::PermissionGroupPrincipal::new(
+            groups[0].id().expect("id").clone(),
+            "nest_g0".into(),
+        )?,
+        &system,
+    )
+    .await?;
+    let perm = gauge::generated::Permission::query(&system)
+        .where_name(valence::StringPredicate::Equals(view.clone()))
+        .limit(1)
+        .first()
+        .await?
+        .expect("perm");
+    perm.relate_to_allowed_principal_record(outer_principal.id().expect("pid"), &system)
+        .await?;
+
+    let mv = user_valence(&system, member);
+    gauge::actor_can_raw::__test_reset_raw_read_count();
+    assert!(
+        gauge::actor_can_raw::actor_can_raw(&mv, &view).await?,
+        "deep nested member must inherit grant"
+    );
+    let reads = gauge::actor_can_raw::__test_raw_read_count();
+    assert!(
+        reads <= RAW_READ_CEILING,
+        "raw walk must stay bounded; got {reads} reads (ceiling {RAW_READ_CEILING})"
+    );
+    Ok(())
+}
+
+#[tokio::test]
 async fn actor_can_raw_matches_actor_can_and_terminates_on_cycle() -> anyhow::Result<()> {
     let system = system_valence().await;
     seed_gluon_catalog(&system).await?;

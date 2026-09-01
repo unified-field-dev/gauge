@@ -14,6 +14,7 @@
 //! telemetry and uses the request permission cache).
 
 use std::collections::HashSet;
+use std::sync::atomic::{AtomicUsize, Ordering};
 
 use valence::{Actor, Valence};
 
@@ -21,6 +22,26 @@ use crate::generated::{
     Permission, PermissionGroup, PermissionGroupPrincipal, PermissionUserPrincipal,
 };
 use crate::super_user::SUPER_USER_GROUP_ID;
+
+/// Counts [`raw_get_json`] + [`permissions_named_raw`] backend hits (integration tests).
+static RAW_READ_COUNT: AtomicUsize = AtomicUsize::new(0);
+
+/// Reset the hidden raw-read counter used by TM-RP-09 bounded-walk tests.
+#[doc(hidden)]
+pub fn __test_reset_raw_read_count() {
+    RAW_READ_COUNT.store(0, Ordering::Relaxed);
+}
+
+/// Current value of the hidden raw-read counter (TM-RP-09).
+#[doc(hidden)]
+pub fn __test_raw_read_count() -> usize {
+    RAW_READ_COUNT.load(Ordering::Relaxed)
+}
+
+#[inline]
+fn note_raw_read() {
+    RAW_READ_COUNT.fetch_add(1, Ordering::Relaxed);
+}
 
 /// Returns `true` when the Valence actor holds `permission_name`, using only
 /// raw backend reads and M2M edge walks (no typed ORM privacy re-entry, no
@@ -94,6 +115,7 @@ async fn raw_get_json(
     id: &str,
     v: &Valence,
 ) -> anyhow::Result<Option<serde_json::Value>> {
+    note_raw_read();
     let backend = v
         .backend_for_table(table)
         .map_err(|e| anyhow::anyhow!("resolve {table} backend: {e}"))?;
@@ -104,6 +126,7 @@ async fn raw_get_json(
 }
 
 async fn permissions_named_raw(name: &str, v: &Valence) -> anyhow::Result<Vec<Permission>> {
+    note_raw_read();
     let backend = v
         .backend_for_table("permission")
         .map_err(|e| anyhow::anyhow!("resolve permission backend: {e}"))?;
