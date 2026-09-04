@@ -38,7 +38,7 @@ No monorepo sibling clones. Playwright / `gauge-app` hydrate are **not** CI jobs
 |-----|----------|
 | **fmt** | `cargo fmt -p gauge -p embedded-gauge-host -- --check` |
 | **clippy** | `cargo clippy -p gauge --features ssr --lib -- -D warnings` then scoped `--test …` suites below, then `cargo clippy -p embedded-gauge-host --all-targets -- -D warnings` |
-| **test** | `cargo test -p gauge --test workspace_members --test product_surface`; domain `--features ssr` contract suites; `cargo check` + `cargo run -p embedded-gauge-host` |
+| **test** | `cargo test -p gauge --test workspace_members --test product_surface`; `cargo test -p gauge --features ssr --lib`; domain `--features ssr` contract suites; `cargo check` + `cargo run -p embedded-gauge-host` |
 | **docs** | `RUSTDOCFLAGS="-D rustdoc::broken-intra-doc-links" cargo doc -p gauge --features ssr --no-deps` |
 
 Clippy/test contract suite names (same list in both jobs):
@@ -82,6 +82,7 @@ cargo clippy -p gauge --features ssr \
   -- -D warnings
 cargo clippy -p embedded-gauge-host --all-targets -- -D warnings
 cargo test -p gauge --test workspace_members --test product_surface
+cargo test -p gauge --features ssr --lib
 cargo test -p gauge --features ssr \
   --test permission_domain_contract \
   --test permission_flows_integration \
@@ -187,6 +188,9 @@ Covering integ tests (service primary):
   Super User Ok / session principal walk (`privacy_policy_integration`)
 - `ensure_creates_bundle_and_maintainer_owns_maintain` /
   `ensure_rejects_missing_maintainer` / `ensure_rejects_invalid_resource_id`
+- `resource_permissions::golden_names::*` — frozen permission names, domain ids,
+  owners groups, and record ids for the four platform kinds (lib units). A failure
+  here means deployed ACL rows would no longer be found by name.
 - `create_permission_request_notifies_permission_owners` /
   `create_permission_request_does_not_notify_non_owners_sad`
 - `search_registry_dispatches_to_registered_sources` /
@@ -218,6 +222,17 @@ behavioral coverage):
 - `layout_auth_gate_and_nav_happy_path` / `layout_drop_auth_guard_sad_path`
 - `admin_mutations_require_gauge_admin_happy_path` / `request_workflow_must_not_require_gauge_admin_sad_path`
 - `index_pages_testid_and_list_bindings_happy_path` / `request_detail_decide_binding_happy_path`
+- TM-11 step-up inventory (composer `server.rs` needles via `product_surface`):
+  `tier_a_mutations_require_step_up_window_happy_path`,
+  `create_domain_and_create_group_must_not_require_step_up_sad_path`,
+  `super_user_membership_requires_fresh_totp_happy_path`
+
+Focused TM-11 inventory:
+
+```bash
+cargo test -p gauge --test product_surface step_up -- --nocapture
+cargo test -p gauge --test product_surface membership -- --nocapture
+```
 
 Runtime GaugeAdmin deny (TM-SEC-09) is Layer 2 in gauge-uf-app-e2e:
 `e2e.perm.detail.save_no_admin`, `e2e.group.detail.save_no_admin`,

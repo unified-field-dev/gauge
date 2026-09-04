@@ -1,34 +1,36 @@
-//! One-shot revoke of NeutrinoSecret umbrella grant edges.
+//! Revoke standing umbrella group grants for every permission of a resource kind.
 //!
-//! After [`crate::resource_permissions::UmbrellaPolicy::None`] for
-//! `NeutrinoSecret`, new bundles no longer grant `neutrino.secret.viewers` /
-//! `.operators`. Existing deployments still have those edges from earlier
-//! ensures. This script removes them without touching creators, catalog
-//! Create*, other kinds, or per-user grants.
+//! After [`super::UmbrellaPolicy::None`], new bundles no longer attach kind-wide groups
+//! to per-resource permissions. Deployments seeded under the old policy still carry those
+//! edges. This helper removes them without touching creators, catalog Create*, other kinds,
+//! or per-user grants.
 
 use anyhow::Context;
 use log::info;
 use valence::{Actor, Model, Valence};
 
 use crate::generated::{Permission, PermissionGroupPrincipal};
-use crate::resource_permissions::ResourceKind;
 
-const VIEWERS: &str = "neutrino.secret.viewers";
-const OPERATORS: &str = "neutrino.secret.operators";
+use super::ResourceKindDescriptor;
 
-/// Revoke umbrella group grants from every `neutrino_secret.*` permission.
+/// Revoke umbrella group grants from every permission whose name starts with `{kind.prefix}.`.
 ///
 /// Idempotent. Safe to re-run.
 ///
 /// # Errors
 ///
-/// Valence / Gauge failures bubble as `anyhow::Error`.
-pub async fn revoke_neutrino_secret_umbrella_grants(v: &Valence) -> anyhow::Result<usize> {
+/// Valence / Gauge failures bubble as [`anyhow::Error`].
+pub async fn revoke_umbrella_grants(
+    v: &Valence,
+    kind: impl Into<ResourceKindDescriptor>,
+    group_ids: &[&str],
+) -> anyhow::Result<usize> {
+    let kind = kind.into();
     let system = v.with_actor(Actor::System {
-        operation: "revoke_neutrino_secret_umbrella_grants".to_string(),
+        operation: format!("revoke_umbrella_grants:{}", kind.prefix),
     });
 
-    let prefix = format!("{}.", ResourceKind::NeutrinoSecret.prefix());
+    let prefix = format!("{}.", kind.prefix);
     let permissions = Permission::query(&system).await?;
     let mut revoked = 0usize;
 
@@ -44,7 +46,7 @@ pub async fn revoke_neutrino_secret_umbrella_grants(v: &Valence) -> anyhow::Resu
             continue;
         };
 
-        for group_id in [VIEWERS, OPERATORS] {
+        for group_id in group_ids {
             if revoke_group_from_permission(&system, &perm_id, group_id).await? {
                 revoked += 1;
                 info!("[permission] revoked umbrella grant group={group_id} permission={name}");
@@ -52,7 +54,10 @@ pub async fn revoke_neutrino_secret_umbrella_grants(v: &Valence) -> anyhow::Resu
         }
     }
 
-    info!("[permission] revoke_neutrino_secret_umbrella_grants done revoked={revoked}");
+    info!(
+        "[permission] revoke_umbrella_grants kind={} revoked={revoked}",
+        kind.prefix
+    );
     Ok(revoked)
 }
 
@@ -82,19 +87,4 @@ async fn revoke_group_from_permission(
         .await
         .with_context(|| format!("unrelate {group_id} from permission {permission_id}"))?;
     Ok(true)
-}
-
-/// Chronon script entry that runs [`revoke_neutrino_secret_umbrella_grants`].
-#[chronon_coordinator_macros::script(
-    name = "revoke_neutrino_secret_umbrella_grants",
-    default_job(job = "revoke-neutrino-secret-umbrella-grants", run_once)
-)]
-pub async fn revoke_neutrino_secret_umbrella_grants_script(
-    ctx: Box<dyn chronon_core::ScriptContext>,
-) -> anyhow::Result<()> {
-    let valence = chronon_valence_identity::valence_from_context(&*ctx)?;
-    revoke_neutrino_secret_umbrella_grants(&valence)
-        .await
-        .context("failed revoking NeutrinoSecret umbrella grants")?;
-    Ok(())
 }
