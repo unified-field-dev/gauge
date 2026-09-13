@@ -22,7 +22,7 @@ fn group_principal_id(group_id: &str) -> String {
 }
 
 async fn ensure_user_principal(user_id: &str, system: &Valence) -> anyhow::Result<RecordId> {
-    let user = lepton::generated::User::get(user_id, system)
+    let user = lepton::generated::User::get_used(user_id, system, valence::use_!("get User in src/scripts/migrate_principal_connections.rs; Valence persistence for this feature path; typed store; visible to session actor / service path."))
         .await?
         .ok_or_else(|| anyhow::anyhow!("User not found during migration: {user_id}"))?;
     let user_record = user
@@ -30,12 +30,12 @@ async fn ensure_user_principal(user_id: &str, system: &Valence) -> anyhow::Resul
         .cloned()
         .ok_or_else(|| anyhow::anyhow!("user id missing after persist"))?;
     let principal_id = user_principal_id(user_id);
-    if PermissionUserPrincipal::get(&principal_id, system)
+    if PermissionUserPrincipal::get_used(&principal_id, system, valence::use_!("get PermissionUserPrincipal in src/scripts/migrate_principal_connections.rs; Valence persistence for this feature path; typed store; visible to session actor / service path."))
         .await?
         .is_none()
     {
         let principal = PermissionUserPrincipal::new(user_record, canonical_user_id(user_id))?;
-        PermissionUserPrincipal::upsert(&principal_id, principal, system).await?;
+        PermissionUserPrincipal::upsert_used(&principal_id, principal, system, valence::use_!("upsert PermissionUserPrincipal in src/scripts/migrate_principal_connections.rs; Valence persistence for this feature path; typed store; visible to session actor / service path.")).await?;
     }
     Ok(RecordId::new(
         "permission_user_principal",
@@ -44,7 +44,7 @@ async fn ensure_user_principal(user_id: &str, system: &Valence) -> anyhow::Resul
 }
 
 async fn ensure_group_principal(group_id: &str, system: &Valence) -> anyhow::Result<RecordId> {
-    let group = PermissionGroup::get(group_id, system)
+    let group = PermissionGroup::get_used(group_id, system, valence::use_!("get PermissionGroup in src/scripts/migrate_principal_connections.rs; Valence persistence for this feature path; typed store; visible to session actor / service path."))
         .await?
         .ok_or_else(|| {
             anyhow::anyhow!("Permission group not found during migration: {group_id}")
@@ -54,12 +54,12 @@ async fn ensure_group_principal(group_id: &str, system: &Valence) -> anyhow::Res
         .cloned()
         .ok_or_else(|| anyhow::anyhow!("group id missing after persist"))?;
     let principal_id = group_principal_id(group_id);
-    if PermissionGroupPrincipal::get(&principal_id, system)
+    if PermissionGroupPrincipal::get_used(&principal_id, system, valence::use_!("get PermissionGroupPrincipal in src/scripts/migrate_principal_connections.rs; Valence persistence for this feature path; typed store; visible to session actor / service path."))
         .await?
         .is_none()
     {
         let principal = PermissionGroupPrincipal::new(group_record, group_id.to_string())?;
-        PermissionGroupPrincipal::upsert(&principal_id, principal, system).await?;
+        PermissionGroupPrincipal::upsert_used(&principal_id, principal, system, valence::use_!("upsert PermissionGroupPrincipal in src/scripts/migrate_principal_connections.rs; Valence persistence for this feature path; typed store; visible to session actor / service path.")).await?;
     }
     Ok(RecordId::new(
         "permission_group_principal",
@@ -90,7 +90,7 @@ async fn ensure_edge(
 }
 
 async fn list_permission_record_ids(system: &Valence) -> anyhow::Result<Vec<RecordId>> {
-    let rows = Permission::query(system).await?;
+    let rows = Permission::query_used(system, valence::use_!("query Permission in src/scripts/migrate_principal_connections.rs; Valence persistence for this feature path; typed store; visible to session actor / service path.")).await?;
     Ok(rows
         .into_iter()
         .filter_map(|row| row.id().cloned())
@@ -98,7 +98,7 @@ async fn list_permission_record_ids(system: &Valence) -> anyhow::Result<Vec<Reco
 }
 
 async fn list_group_record_ids(system: &Valence) -> anyhow::Result<Vec<RecordId>> {
-    let rows = PermissionGroup::query(system).await?;
+    let rows = PermissionGroup::query_used(system, valence::use_!("query PermissionGroup in src/scripts/migrate_principal_connections.rs; Valence persistence for this feature path; typed store; visible to session actor / service path.")).await?;
     Ok(rows
         .into_iter()
         .filter_map(|row| row.id().cloned())

@@ -66,7 +66,7 @@ pub async fn create_permission(
         now,
     )?;
 
-    let created = Permission::create(permission, system).await?;
+    let created = Permission::create_used(permission, system, valence::use_!("create Permission in src/service/permissions.rs; Valence persistence for this feature path; typed store; visible to session actor / service path.")).await?;
     Ok(created)
 }
 
@@ -112,7 +112,7 @@ pub async fn update_permission(
         description
     };
     let saved = existing
-        .get_mutable(v)
+        .get_mutable_used(v, valence::use_!("get_mutable via permissions.rs; mutable handle for in-place update; typed store; session/service path."))
         .set_owners_group(next_owners_group_id)?
         .set_domain(domain_record_id)?
         .set_name(name)?
@@ -415,7 +415,7 @@ pub async fn list_permissions(
         .filter(|s| !s.is_empty());
 
     let mut out = Vec::new();
-    for permission in Permission::query(v).await? {
+    for permission in Permission::query_used(v, valence::use_!("query Permission in src/service/permissions.rs; Valence persistence for this feature path; typed store; visible to session actor / service path.")).await? {
         if let Some(ref needle) = needle {
             let name = permission.name().to_lowercase();
             let description = permission
@@ -448,7 +448,7 @@ pub async fn list_groups(
         .filter(|s| !s.is_empty());
 
     let mut out = Vec::new();
-    for group in PermissionGroup::query(v).await? {
+    for group in PermissionGroup::query_used(v, valence::use_!("query PermissionGroup in src/service/permissions.rs; Valence persistence for this feature path; typed store; visible to session actor / service path.")).await? {
         if let Some(ref needle) = needle {
             let name = group.name().to_lowercase();
             let description = group

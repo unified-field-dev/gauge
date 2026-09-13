@@ -123,7 +123,7 @@ pub async fn create_permission_request(
         now,
         now,
     )?;
-    let created = PermissionRequest::create(request, system).await?;
+    let created = PermissionRequest::create_used(request, system, valence::use_!("create PermissionRequest in src/service/requests.rs; Valence persistence for this feature path; typed store; visible to session actor / service path.")).await?;
     request_row_from_model(&created, v).await
 }
 
@@ -136,7 +136,7 @@ pub async fn list_permission_requests_for_actor(
         return Ok(Vec::new());
     };
     let lookup = v;
-    let rows = PermissionRequest::query(lookup)
+    let rows = PermissionRequest::query_used(lookup, valence::use_!("query PermissionRequest in src/service/requests.rs; Valence persistence for this feature path; typed store; visible to session actor / service path."))
         .where_requestor(valence::RecordPredicate::Equals(require_model_id(
             requestor.id(),
             "requestor",
@@ -163,7 +163,7 @@ pub async fn list_permission_requests_for_review(
     }
 
     let lookup = v;
-    let rows = PermissionRequest::query(lookup)
+    let rows = PermissionRequest::query_used(lookup, valence::use_!("query PermissionRequest in src/service/requests.rs; Valence persistence for this feature path; typed store; visible to session actor / service path."))
         .where_status(valence::StringPredicate::Equals("PENDING".to_string()))
         .order_by_created_at(valence::SortDirection::Desc)
         .await?;
@@ -238,7 +238,7 @@ pub async fn decide_permission_request(
 
     let write = v;
     request
-        .get_mutable(write)
+        .get_mutable_used(write, valence::use_!("get_mutable via requests.rs; mutable handle for in-place update; typed store; session/service path."))
         .set_approver(require_model_id(approver.id(), "approver")?)?
         .set_status(new_status)?
         .set_updated_at(Utc::now())?
@@ -285,7 +285,7 @@ pub async fn list_history(
     let _actor_user_id = require_user_id(v)?;
     let lookup = v;
     let mut query =
-        PermissionHistory::query(lookup).order_by_changed_at(valence::SortDirection::Desc);
+        PermissionHistory::query_used(lookup, valence::use_!("query PermissionHistory in src/service/requests.rs; Valence persistence for this feature path; typed store; visible to session actor / service path.")).order_by_changed_at(valence::SortDirection::Desc);
     if let (Some(ref want_kind), Some(ref want_id)) = (&subject_kind, &subject_id) {
         if !want_kind.is_empty() && !want_id.is_empty() {
             query = query.where_source(valence::RecordPredicate::Equals(valence::RecordId::new(

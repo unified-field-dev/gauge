@@ -91,7 +91,7 @@ pub async fn append_history_row(
         Utc::now(),
         actor,
     )?;
-    if let Err(e) = PermissionHistory::create(row, valence).await {
+    if let Err(e) = PermissionHistory::create_used(row, valence, valence::use_!("create PermissionHistory in src/side_effects/history_logger.rs; Valence persistence for this feature path; typed store; visible to session actor / service path.")).await {
         log::warn!(
             "permission history append failed: source={source} field={}: {e}",
             parts.field_name
@@ -300,7 +300,7 @@ pub async fn delete_history_source(
 ) -> anyhow::Result<()> {
     match table {
         "permission" => {
-            if let Some(before) = Permission::get(id, valence).await? {
+            if let Some(before) = Permission::get_used(id, valence, valence::use_!("get Permission in src/side_effects/history_logger.rs; Valence persistence for this feature path; typed store; visible to session actor / service path.")).await? {
                 let field_changes =
                     crate::generated::PermissionFieldChanges::compute(Some(&before), None);
                 let mutation = valence::Mutation::new(
@@ -314,10 +314,10 @@ pub async fn delete_history_source(
                     .on_permission_mutation(&mutation, Some(id))
                     .await?;
             }
-            Permission::delete(id, valence).await?;
+            Permission::delete_used(id, valence, valence::use_!("delete Permission in src/side_effects/history_logger.rs; Valence persistence for this feature path; typed store; visible to session actor / service path.")).await?;
         }
         "permission_group" => {
-            if let Some(before) = PermissionGroup::get(id, valence).await? {
+            if let Some(before) = PermissionGroup::get_used(id, valence, valence::use_!("get PermissionGroup in src/side_effects/history_logger.rs; Valence persistence for this feature path; typed store; visible to session actor / service path.")).await? {
                 let field_changes =
                     crate::generated::PermissionGroupFieldChanges::compute(Some(&before), None);
                 let mutation = valence::Mutation::new(
@@ -331,7 +331,7 @@ pub async fn delete_history_source(
                     .on_group_mutation(&mutation, Some(id))
                     .await?;
             }
-            PermissionGroup::delete(id, valence).await?;
+            PermissionGroup::delete_used(id, valence, valence::use_!("delete PermissionGroup in src/side_effects/history_logger.rs; Valence persistence for this feature path; typed store; visible to session actor / service path.")).await?;
         }
         other => anyhow::bail!("unsupported history source table: {other}"),
     }

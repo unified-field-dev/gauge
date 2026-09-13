@@ -23,7 +23,7 @@ async fn ensure_standalone_group(
     description: &str,
     system: &Valence,
 ) -> anyhow::Result<()> {
-    if PermissionGroup::get(group_id, system).await?.is_some() {
+    if PermissionGroup::get_used(group_id, system, valence::use_!("get PermissionGroup in gauge/src/gluon_operator_groups.rs; Valence persistence for this feature path; typed store; visible to session actor / service path.")).await?.is_some() {
         return Ok(());
     }
     let now = Utc::now();
@@ -33,7 +33,7 @@ async fn ensure_standalone_group(
         now,
         now,
     )?;
-    PermissionGroup::upsert(group_id, group, system).await?;
+    PermissionGroup::upsert_used(group_id, group, system, valence::use_!("upsert PermissionGroup in gauge/src/gluon_operator_groups.rs; Valence persistence for this feature path; typed store; visible to session actor / service path.")).await?;
     log::info!("[permission] Seeded Gluon operator group {group_id} ({display_name})");
     Ok(())
 }
@@ -42,7 +42,7 @@ async fn ensure_group_principal(
     group_id: &str,
     system: &Valence,
 ) -> anyhow::Result<PermissionGroupPrincipal> {
-    let group = PermissionGroup::get(group_id, system)
+    let group = PermissionGroup::get_used(group_id, system, valence::use_!("get PermissionGroup in gauge/src/gluon_operator_groups.rs; Valence persistence for this feature path; typed store; visible to session actor / service path."))
         .await?
         .ok_or_else(|| anyhow::anyhow!("permission group {group_id} not found"))?;
     let group_thing = group
@@ -50,11 +50,11 @@ async fn ensure_group_principal(
         .cloned()
         .ok_or_else(|| anyhow::anyhow!("group id missing after persist"))?;
     let principal_id = format!("permission_group:{group_id}");
-    if let Some(p) = PermissionGroupPrincipal::get(&principal_id, system).await? {
+    if let Some(p) = PermissionGroupPrincipal::get_used(&principal_id, system, valence::use_!("get PermissionGroupPrincipal in gauge/src/gluon_operator_groups.rs; Valence persistence for this feature path; typed store; visible to session actor / service path.")).await? {
         return Ok(p);
     }
     let principal = PermissionGroupPrincipal::new(group_thing, group_id.to_string())?;
-    PermissionGroupPrincipal::upsert(&principal_id, principal, system)
+    PermissionGroupPrincipal::upsert_used(&principal_id, principal, system, valence::use_!("upsert PermissionGroupPrincipal in gauge/src/gluon_operator_groups.rs; Valence persistence for this feature path; typed store; visible to session actor / service path."))
         .await
         .map_err(|e| anyhow::anyhow!("upsert permission_group_principal {principal_id}: {e}"))
 }
@@ -64,7 +64,7 @@ async fn grant_named_permission_to_group(
     group_id: &str,
     permission_name: &str,
 ) -> anyhow::Result<()> {
-    let Some(perm) = Permission::query(system)
+    let Some(perm) = Permission::query_used(system, valence::use_!("query Permission in gauge/src/gluon_operator_groups.rs; Valence persistence for this feature path; typed store; visible to session actor / service path."))
         .where_name(StringPredicate::Equals(permission_name.to_string()))
         .limit(1)
         .first()

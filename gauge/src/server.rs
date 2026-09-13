@@ -71,7 +71,7 @@ pub async fn resolve_permission_id_by_name(
         let valence = ctx
             .valence()
             .map_err(|e| ServerFnError::new(format!("Failed to build Valence: {e}")))?;
-        let rows = crate::generated::Permission::query(&valence)
+        let rows = crate::generated::Permission::query_used(&valence, valence::use_!("query Permission in gauge/src/server.rs; Valence persistence for this feature path; typed store; visible to session actor / service path."))
             .where_name(StringPredicate::Equals(permission_name))
             .limit(1)
             .await

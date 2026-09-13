@@ -61,7 +61,7 @@ impl uf_search_core::SearchSourceProvider for PlatformUserSearchSource {
         Box::pin(async move {
             let query_lower = query_text.to_lowercase();
             // InMemory backends only apply equality WHERE; scan + filter Contains here.
-            let users = lepton::generated::User::query(v)
+            let users = lepton::generated::User::query_used(v, valence::use_!("query User in gauge/src/search_sources.rs; Valence persistence for this feature path; typed store; visible to session actor / service path."))
                 .limit(max_results.saturating_mul(20).max(50))
                 .await?;
             let mut out = Vec::new();
@@ -109,7 +109,7 @@ impl uf_search_core::SearchSourceProvider for PermissionGroupSearchSource {
         Box::pin(async move {
             // InMemory backends only apply equality WHERE clauses; filter Contains
             // in-process so pickers work across mem/sqlite/surreal.
-            let groups = crate::generated::PermissionGroup::query(v)
+            let groups = crate::generated::PermissionGroup::query_used(v, valence::use_!("query PermissionGroup in gauge/src/search_sources.rs; Valence persistence for this feature path; typed store; visible to session actor / service path."))
                 .limit(max_results.saturating_mul(20).max(50))
                 .await?;
             let query_lower = query_text.to_lowercase();

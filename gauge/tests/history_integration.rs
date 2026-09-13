@@ -217,7 +217,7 @@ async fn delete_group_keeps_session_actor_on_deleted_history() {
 
     // Soft-delete keeps history until DAG finalize; harness uses noop dispatcher.
     // Query rows directly: list_history can-edit gates hide subjects after delete.
-    let rows = PermissionHistory::query(&system)
+    let rows = PermissionHistory::query_used(&system, valence::use_!("query PermissionHistory in gauge/tests/history_integration.rs; Valence persistence for this feature path; typed store; visible to test harness."))
         .await
         .expect("query permission_history");
     let deleted = rows
@@ -325,7 +325,7 @@ async fn list_history_caps_at_max_history_list_rows() {
             Some(valence::RecordId::new("user", "owner")),
         )
         .expect("history row");
-        PermissionHistory::create(row, &owner_ctx)
+        PermissionHistory::create_used(row, &owner_ctx, valence::use_!("create PermissionHistory in gauge/tests/history_integration.rs; Valence persistence for this feature path; typed store; visible to test harness."))
             .await
             .unwrap_or_else(|e| panic!("create history row {i}: {e}"));
     }

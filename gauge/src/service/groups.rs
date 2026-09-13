@@ -45,7 +45,7 @@ pub async fn create_group(
         now,
         now,
     )?;
-    let created = PermissionGroup::create(group, system).await?;
+    let created = PermissionGroup::create_used(group, system, valence::use_!("create PermissionGroup in src/service/groups.rs; Valence persistence for this feature path; typed store; visible to session actor / service path.")).await?;
 
     let lookup = v;
     if let Some(user) = get_user_by_actor_id(&actor_user_id, lookup).await? {
@@ -105,7 +105,7 @@ pub async fn update_group(
     // get_mutable keeps record id for owner privacy policies (upsert of a new()
     // model without id fails GROUP_OWNER_RECURSIVE).
     let mut builder = existing
-        .get_mutable(v)
+        .get_mutable_used(v, valence::use_!("get_mutable via groups.rs; mutable handle for in-place update; typed store; session/service path."))
         .set_name(next_name)?
         .set_updated_at(Utc::now())?;
     builder = match desc {

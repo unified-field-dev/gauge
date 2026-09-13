@@ -91,7 +91,7 @@ async fn ensure_domain(
 ) -> anyhow::Result<PermissionDomain> {
     let domain_id = normalized_id(&domain.key);
     // No-change fast path: existing domain → zero writes (boot preflight stays cheap).
-    if let Some(existing) = PermissionDomain::get(&domain_id, system).await? {
+    if let Some(existing) = PermissionDomain::get_used(&domain_id, system, valence::use_!("get PermissionDomain in gauge/src/manifest_sync.rs; Valence persistence for this feature path; typed store; visible to session actor / service path.")).await? {
         stats.domains_existing += 1;
         return Ok(existing);
     }
@@ -109,14 +109,14 @@ async fn ensure_domain(
         now,
         now,
     )?;
-    let persisted = PermissionDomain::upsert(&domain_id, created, system).await?;
+    let persisted = PermissionDomain::upsert_used(&domain_id, created, system, valence::use_!("upsert PermissionDomain in gauge/src/manifest_sync.rs; Valence persistence for this feature path; typed store; visible to session actor / service path.")).await?;
     stats.domains_created += 1;
     Ok(persisted)
 }
 
 async fn ensure_owner_group(app_id: &str, system: &Valence) -> anyhow::Result<PermissionGroup> {
     let group_id = format!("manifest_{}_owners", normalized_id(app_id));
-    if let Some(existing) = PermissionGroup::get(&group_id, system).await? {
+    if let Some(existing) = PermissionGroup::get_used(&group_id, system, valence::use_!("get PermissionGroup in gauge/src/manifest_sync.rs; Valence persistence for this feature path; typed store; visible to session actor / service path.")).await? {
         return Ok(existing);
     }
 
@@ -127,12 +127,12 @@ async fn ensure_owner_group(app_id: &str, system: &Valence) -> anyhow::Result<Pe
         now,
         now,
     )?;
-    let persisted = PermissionGroup::upsert(&group_id, group, system).await?;
+    let persisted = PermissionGroup::upsert_used(&group_id, group, system, valence::use_!("upsert PermissionGroup in gauge/src/manifest_sync.rs; Valence persistence for this feature path; typed store; visible to session actor / service path.")).await?;
     Ok(persisted)
 }
 
 async fn permission_exists_by_name(name: &str, system: &Valence) -> anyhow::Result<bool> {
-    let records = Permission::query(system)
+    let records = Permission::query_used(system, valence::use_!("query Permission in gauge/src/manifest_sync.rs; Valence persistence for this feature path; typed store; visible to session actor / service path."))
         .where_name(StringPredicate::Equals(name.to_string()))
         .await?;
     Ok(!records.is_empty())
@@ -182,7 +182,7 @@ async fn ensure_permission(
         now,
         now,
     )?;
-    Permission::upsert(&permission_id, record, system).await?;
+    Permission::upsert_used(&permission_id, record, system, valence::use_!("upsert Permission in gauge/src/manifest_sync.rs; Valence persistence for this feature path; typed store; visible to session actor / service path.")).await?;
     stats.permissions_created += 1;
     Ok(())
 }

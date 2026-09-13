@@ -21,12 +21,12 @@ async fn target_owner_user_ids(
     let mut out: Vec<RecordId> = Vec::new();
 
     if table == "permission" {
-        if let Some(permission) = Permission::get(&id, lookup).await? {
+        if let Some(permission) = Permission::get_used(&id, lookup, valence::use_!("get Permission in src/side_effects/permission_request_notifier.rs; Valence persistence for this feature path; typed store; visible to session actor / service path.")).await? {
             let owners_group = permission.get_owners_group(lookup).await?;
             collect_owner_user_ids_from_group(&owners_group, lookup, &mut out).await?;
         }
     } else if table == "permission_group" {
-        if let Some(group) = PermissionGroup::get(&id, lookup).await? {
+        if let Some(group) = PermissionGroup::get_used(&id, lookup, valence::use_!("get PermissionGroup in src/side_effects/permission_request_notifier.rs; Valence persistence for this feature path; typed store; visible to session actor / service path.")).await? {
             collect_owner_user_ids_from_group(&group, lookup, &mut out).await?;
         }
     }
@@ -57,19 +57,19 @@ async fn collect_owner_user_ids_from_group(
             match owner.table() {
                 "permission_user_principal" => {
                     if let Some(principal) =
-                        PermissionUserPrincipal::get(&owner_id, valence).await?
+                        PermissionUserPrincipal::get_used(&owner_id, valence, valence::use_!("get PermissionUserPrincipal in src/side_effects/permission_request_notifier.rs; Valence persistence for this feature path; typed store; visible to session actor / service path.")).await?
                     {
                         out.push(principal.user().clone());
                     }
                 }
                 "permission_group_principal" => {
                     if let Some(principal) =
-                        PermissionGroupPrincipal::get(&owner_id, valence).await?
+                        PermissionGroupPrincipal::get_used(&owner_id, valence, valence::use_!("get PermissionGroupPrincipal in src/side_effects/permission_request_notifier.rs; Valence persistence for this feature path; typed store; visible to session actor / service path.")).await?
                     {
                         let nested_id =
                             valence::extract_id_from_record(principal.group()).unwrap_or_default();
                         if let Some(nested_group) =
-                            PermissionGroup::get(&nested_id, valence).await?
+                            PermissionGroup::get_used(&nested_id, valence, valence::use_!("get PermissionGroup in src/side_effects/permission_request_notifier.rs; Valence persistence for this feature path; typed store; visible to session actor / service path.")).await?
                         {
                             queue.push(nested_group);
                         }

@@ -34,7 +34,7 @@ pub async fn create_domain(
         now,
     )?;
     let system = v;
-    let created = PermissionDomain::create(domain, system).await?;
+    let created = PermissionDomain::create_used(domain, system, valence::use_!("create PermissionDomain in src/service/domains.rs; Valence persistence for this feature path; typed store; visible to session actor / service path.")).await?;
     Ok(created)
 }
 
