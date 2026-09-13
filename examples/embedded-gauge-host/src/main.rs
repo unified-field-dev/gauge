@@ -136,7 +136,7 @@ async fn seed_user(id: &str, email: &str, valence: &Valence) {
         now,
     )
     .expect("build user");
-    lepton::generated::User::upsert_used(id, user, valence, valence::use_!("upsert User in embedded-gauge-host/src/main.rs; Valence persistence for this feature path; typed store; visible to session actor / service path."))
+    lepton::generated::User::upsert_used(id, user, valence, valence::use_!(r#"When **Gauge permissions** needs to persist work, we **save User** so the next step in that feature can continue with the latest values. People and services allowed for **Gauge permissions** use this data for that workflow—not as a general export of unrelated personal fields."#))
         .await
         .expect("upsert user");
 }
@@ -155,7 +155,7 @@ async fn seed_super_user_owner(
         )
         .expect("build super user group"),
         system,
-        valence::use_!("upsert PermissionGroup in embedded-gauge-host/src/main.rs; Valence persistence for this feature path; typed store; visible to session actor / service path."),
+        valence::use_!(r#"When **Gauge permissions** needs to persist work, we **save Permission Group** so the next step in that feature can continue with the latest values. People and services allowed for **Gauge permissions** use this data for that workflow—not as a general export of unrelated personal fields."#),
     )
     .await
     .expect("bootstrap super user group");
@@ -164,7 +164,7 @@ async fn seed_super_user_owner(
         PermissionUserPrincipal::new(RecordId::new("user", "owner-1"), "owner-1".into())
             .expect("owner principal"),
         system,
-        valence::use_!("upsert PermissionUserPrincipal in embedded-gauge-host/src/main.rs; Valence persistence for this feature path; typed store; visible to session actor / service path."),
+        valence::use_!(r#"When **Gauge permissions** needs to persist work, we **save Permission User Principal** so the next step in that feature can continue with the latest values. People and services allowed for **Gauge permissions** use this data for that workflow—not as a general export of unrelated personal fields."#),
     )
     .await
     .expect("upsert owner principal");
@@ -189,7 +189,7 @@ async fn seed_demo_permission(
         PermissionGroup::new("Deployers".into(), Some("demo owners".into()), now, now)
             .expect("owners group"),
         system,
-        valence::use_!("upsert PermissionGroup in embedded-gauge-host/src/main.rs; Valence persistence for this feature path; typed store; visible to session actor / service path."),
+        valence::use_!(r#"When **Gauge permissions** needs to persist work, we **save Permission Group** so the next step in that feature can continue with the latest values. People and services allowed for **Gauge permissions** use this data for that workflow—not as a general export of unrelated personal fields."#),
     )
     .await
     .expect("upsert owners");
@@ -210,7 +210,7 @@ async fn seed_demo_permission(
         )
         .expect("domain"),
         system,
-        valence::use_!("upsert PermissionDomain in embedded-gauge-host/src/main.rs; Valence persistence for this feature path; typed store; visible to session actor / service path."),
+        valence::use_!(r#"When **Gauge permissions** needs to persist work, we **save Permission Domain** so the next step in that feature can continue with the latest values. People and services allowed for **Gauge permissions** use this data for that workflow—not as a general export of unrelated personal fields."#),
     )
     .await
     .expect("upsert domain");
@@ -229,7 +229,7 @@ async fn seed_demo_permission(
         )
         .expect("permission"),
         system,
-        valence::use_!("upsert Permission in embedded-gauge-host/src/main.rs; Valence persistence for this feature path; typed store; visible to session actor / service path."),
+        valence::use_!(r#"When **Gauge permissions** needs to persist work, we **save Permission** so the next step in that feature can continue with the latest values. People and services allowed for **Gauge permissions** use this data for that workflow—not as a general export of unrelated personal fields."#),
     )
     .await
     .expect("upsert permission");
@@ -266,7 +266,7 @@ async fn bootstrap_host() -> HostState {
         PermissionUserPrincipal::new(RecordId::new("user", "member-1"), "member-1".into())
             .expect("member principal"),
         &system,
-        valence::use_!("upsert PermissionUserPrincipal in embedded-gauge-host/src/main.rs; Valence persistence for this feature path; typed store; visible to session actor / service path."),
+        valence::use_!(r#"When **Gauge permissions** needs to persist work, we **save Permission User Principal** so the next step in that feature can continue with the latest values. People and services allowed for **Gauge permissions** use this data for that workflow—not as a general export of unrelated personal fields."#),
     )
     .await
     .expect("upsert member principal");

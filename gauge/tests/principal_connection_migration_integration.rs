@@ -281,10 +281,10 @@ async fn super_user_review_queue_hidden_but_direct_approval_allowed() -> anyhow:
             Utc::now(),
         )?,
         &system,
-        valence::use_!("upsert PermissionGroup in gauge/tests/principal_connection_migration_integration.rs; Valence persistence for this feature path; typed store; visible to test harness."),
+        valence::use_!(r#"**Test:** Fixture **Permission Group** save for `tests` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."#),
     )
     .await?;
-    let super_user = lepton::generated::User::get_used("super", &system, valence::use_!("get User in gauge/tests/principal_connection_migration_integration.rs; Valence persistence for this feature path; typed store; visible to test harness."))
+    let super_user = lepton::generated::User::get_used("super", &system, valence::use_!(r#"**Test:** Fixture **User** load for `tests` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."#))
         .await?
         .expect("super user exists");
     let super_principal = gauge::generated::PermissionUserPrincipal::upsert_used(
@@ -294,7 +294,7 @@ async fn super_user_review_queue_hidden_but_direct_approval_allowed() -> anyhow:
             "super".to_string(),
         )?,
         &system,
-        valence::use_!("upsert PermissionUserPrincipal in gauge/tests/principal_connection_migration_integration.rs; Valence persistence for this feature path; typed store; visible to test harness."),
+        valence::use_!(r#"**Test:** Fixture **Permission User Principal** save for `tests` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."#),
     )
     .await?;
     super_group

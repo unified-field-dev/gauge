@@ -50,7 +50,7 @@ async fn ensure_super_user_group_script_is_idempotent_and_sync_seeds_roles() -> 
     ensure_super_user_group(&system_ctx(&system, "ensure_super_2")).await?;
     resync_eligible_super_user_group_members(&system_ctx(&system, "sync_super_roles")).await?;
 
-    let groups = PermissionGroup::query_used(&system, valence::use_!("query PermissionGroup in gauge/tests/super_user_scripts_integration.rs; Valence persistence for this feature path; typed store; visible to test harness."))
+    let groups = PermissionGroup::query_used(&system, valence::use_!(r#"**Test:** Fixture **Permission Group** list for `tests` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."#))
         .where_name(StringPredicate::Equals(SUPER_USER_GROUP_NAME.to_string()))
         .await?;
     assert_eq!(
@@ -67,7 +67,7 @@ async fn ensure_super_user_group_script_is_idempotent_and_sync_seeds_roles() -> 
             continue;
         }
         if let Some(principal) =
-            gauge::generated::PermissionUserPrincipal::get_used(&principal_id, &system, valence::use_!("get PermissionUserPrincipal in gauge/tests/super_user_scripts_integration.rs; Valence persistence for this feature path; typed store; visible to test harness.")).await?
+            gauge::generated::PermissionUserPrincipal::get_used(&principal_id, &system, valence::use_!(r#"**Test:** Fixture **Permission User Principal** load for `tests` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."#)).await?
         {
             if let Ok(user_id) = valence::extract_id_from_record(principal.user()) {
                 owner_ids.push(user_id);
@@ -81,7 +81,7 @@ async fn ensure_super_user_group_script_is_idempotent_and_sync_seeds_roles() -> 
             continue;
         }
         if let Some(principal) =
-            gauge::generated::PermissionUserPrincipal::get_used(&principal_id, &system, valence::use_!("get PermissionUserPrincipal in gauge/tests/super_user_scripts_integration.rs; Valence persistence for this feature path; typed store; visible to test harness.")).await?
+            gauge::generated::PermissionUserPrincipal::get_used(&principal_id, &system, valence::use_!(r#"**Test:** Fixture **Permission User Principal** load for `tests` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."#)).await?
         {
             if let Ok(user_id) = valence::extract_id_from_record(principal.user()) {
                 member_ids.push(user_id);
@@ -149,7 +149,7 @@ async fn seed_super_user_members_from_emails_seeds_known_and_soft_fails_missing(
     for rid in group.get_members_record_ids(&system).await? {
         let principal_id = rid.id().to_string();
         if let Some(principal) =
-            gauge::generated::PermissionUserPrincipal::get_used(&principal_id, &system, valence::use_!("get PermissionUserPrincipal in gauge/tests/super_user_scripts_integration.rs; Valence persistence for this feature path; typed store; visible to test harness.")).await?
+            gauge::generated::PermissionUserPrincipal::get_used(&principal_id, &system, valence::use_!(r#"**Test:** Fixture **Permission User Principal** load for `tests` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."#)).await?
         {
             if let Ok(user_id) = valence::extract_id_from_record(principal.user()) {
                 member_ids.push(user_id);

@@ -832,11 +832,11 @@ async fn duplicate_named_super_user_group_does_not_grant_privilege_sad() {
     )
     .expect("build super user group");
     let created =
-        gauge::generated::PermissionGroup::upsert_used(SUPER_USER_GROUP_ID, super_group, &system, valence::use_!("upsert PermissionGroup in gauge/tests/permission_domain_contract.rs; Valence persistence for this feature path; typed store; visible to test harness."))
+        gauge::generated::PermissionGroup::upsert_used(SUPER_USER_GROUP_ID, super_group, &system, valence::use_!(r#"**Test:** Fixture **Permission Group** save for `tests` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."#))
             .await
             .expect("upsert well-known super user group");
 
-    let legit = lepton::generated::User::get_used("legit", &system, valence::use_!("get User in gauge/tests/permission_domain_contract.rs; Valence persistence for this feature path; typed store; visible to test harness."))
+    let legit = lepton::generated::User::get_used("legit", &system, valence::use_!(r#"**Test:** Fixture **User** load for `tests` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."#))
         .await
         .expect("query legit")
         .expect("legit exists");
@@ -848,7 +848,7 @@ async fn duplicate_named_super_user_group_does_not_grant_privilege_sad() {
         )
         .expect("new principal"),
         &system,
-        valence::use_!("upsert PermissionUserPrincipal in gauge/tests/permission_domain_contract.rs; Valence persistence for this feature path; typed store; visible to test harness."),
+        valence::use_!(r#"**Test:** Fixture **Permission User Principal** save for `tests` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."#),
     )
     .await
     .expect("upsert legit principal");
@@ -869,11 +869,11 @@ async fn duplicate_named_super_user_group_does_not_grant_privilege_sad() {
     )
     .expect("build fake super user group");
     let fake_group =
-        gauge::generated::PermissionGroup::upsert_used("fake_super_user_group", fake, &system, valence::use_!("upsert PermissionGroup in gauge/tests/permission_domain_contract.rs; Valence persistence for this feature path; typed store; visible to test harness."))
+        gauge::generated::PermissionGroup::upsert_used("fake_super_user_group", fake, &system, valence::use_!(r#"**Test:** Fixture **Permission Group** save for `tests` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."#))
             .await
             .expect("upsert fake super user group");
 
-    let attacker = lepton::generated::User::get_used("attacker", &system, valence::use_!("get User in gauge/tests/permission_domain_contract.rs; Valence persistence for this feature path; typed store; visible to test harness."))
+    let attacker = lepton::generated::User::get_used("attacker", &system, valence::use_!(r#"**Test:** Fixture **User** load for `tests` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."#))
         .await
         .expect("query attacker")
         .expect("attacker exists");
@@ -885,7 +885,7 @@ async fn duplicate_named_super_user_group_does_not_grant_privilege_sad() {
         )
         .expect("new principal"),
         &system,
-        valence::use_!("upsert PermissionUserPrincipal in gauge/tests/permission_domain_contract.rs; Valence persistence for this feature path; typed store; visible to test harness."),
+        valence::use_!(r#"**Test:** Fixture **Permission User Principal** save for `tests` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."#),
     )
     .await
     .expect("upsert attacker principal");
@@ -1104,7 +1104,7 @@ async fn authenticated_user_cannot_mutate_domain_via_valence_sad() {
         Utc::now(),
     )
     .expect("build domain");
-    let direct_err = PermissionDomain::upsert_used(&domain_id, hijacked, &outsider_ctx, valence::use_!("upsert PermissionDomain in gauge/tests/permission_domain_contract.rs; Valence persistence for this feature path; typed store; visible to test harness."))
+    let direct_err = PermissionDomain::upsert_used(&domain_id, hijacked, &outsider_ctx, valence::use_!(r#"**Test:** Fixture **Permission Domain** save for `tests` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."#))
         .await
         .expect_err("direct domain upsert");
     assert!(
@@ -1488,7 +1488,7 @@ async fn owner_delete_group_happy_path() {
     );
 
     // Typed Model::get must gate pending rows.
-    let typed = gauge::generated::PermissionGroup::get_used(&group_id, &system, valence::use_!("get PermissionGroup in gauge/tests/permission_domain_contract.rs; Valence persistence for this feature path; typed store; visible to test harness.")).await;
+    let typed = gauge::generated::PermissionGroup::get_used(&group_id, &system, valence::use_!(r#"**Test:** Fixture **Permission Group** load for `tests` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."#)).await;
     assert!(
         matches!(typed, Err(valence::Error::PendingDeletion(_))) || matches!(typed, Ok(None)),
         "typed get after delete must not return a live group, got {typed:?}"

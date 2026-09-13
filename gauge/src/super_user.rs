@@ -58,7 +58,7 @@ async fn ensure_user_principal(
             .ok_or_else(|| anyhow::anyhow!("user id missing after persist"))?,
     )?;
     let principal_id = user_principal_id(&user_id);
-    if let Some(existing) = PermissionUserPrincipal::get_used(&principal_id, system, valence::use_!("get PermissionUserPrincipal in gauge/src/super_user.rs; Valence persistence for this feature path; typed store; visible to session actor / service path.")).await? {
+    if let Some(existing) = PermissionUserPrincipal::get_used(&principal_id, system, valence::use_!(r#"In **Gauge permissions**, we **load Permission User Principal** so the application can decide what to do next in this workflow. The result is used by **Gauge permissions** logic—not necessarily displayed on a page unless that feature’s UI shows it."#)).await? {
         return Ok(existing);
     }
     let principal = PermissionUserPrincipal::new(
@@ -67,7 +67,7 @@ async fn ensure_user_principal(
             .clone(),
         canonical_user_id(&user_id),
     )?;
-    Ok(PermissionUserPrincipal::upsert_used(&principal_id, principal, system, valence::use_!("upsert PermissionUserPrincipal in gauge/src/super_user.rs; Valence persistence for this feature path; typed store; visible to session actor / service path.")).await?)
+    Ok(PermissionUserPrincipal::upsert_used(&principal_id, principal, system, valence::use_!(r#"When **Gauge permissions** needs to persist work, we **save Permission User Principal** so the next step in that feature can continue with the latest values. People and services allowed for **Gauge permissions** use this data for that workflow—not as a general export of unrelated personal fields."#)).await?)
 }
 
 /// `true` when the request actor is a system actor or a (possibly transitive) member
@@ -127,7 +127,7 @@ pub async fn ensure_super_user_group(system: &Valence) -> anyhow::Result<Permiss
             now,
         )?,
         system,
-        valence::use_!("upsert PermissionGroup in gauge/src/super_user.rs; Valence persistence for this feature path; typed store; visible to session actor / service path."),
+        valence::use_!(r#"When **Gauge permissions** needs to persist work, we **save Permission Group** so the next step in that feature can continue with the latest values. People and services allowed for **Gauge permissions** use this data for that workflow—not as a general export of unrelated personal fields."#),
     )
     .await?;
     warn_duplicate_super_user_name_groups(system).await?;
@@ -135,7 +135,7 @@ pub async fn ensure_super_user_group(system: &Valence) -> anyhow::Result<Permiss
 }
 
 async fn warn_duplicate_super_user_name_groups(system: &Valence) -> anyhow::Result<()> {
-    let groups = PermissionGroup::query_used(system, valence::use_!("query PermissionGroup in gauge/src/super_user.rs; Valence persistence for this feature path; typed store; visible to session actor / service path."))
+    let groups = PermissionGroup::query_used(system, valence::use_!(r#"In **Gauge permissions**, we **list Permission Group** so the product can show or process the matching set for this workflow. Callers allowed for **Gauge permissions** use the list; it is not a public dump of every field to anonymous visitors."#))
         .where_name(StringPredicate::Equals(SUPER_USER_GROUP_NAME.to_string()))
         .await?;
     let foreign = groups
@@ -169,10 +169,10 @@ async fn sync_eligible_roles_into_super_group(
     system: &Valence,
     super_group: &PermissionGroup,
 ) -> anyhow::Result<()> {
-    let role_memberships = lepton::generated::AccountMembership::query_used(system, valence::use_!("query AccountMembership in gauge/src/super_user.rs; Valence persistence for this feature path; typed store; visible to session actor / service path."))
+    let role_memberships = lepton::generated::AccountMembership::query_used(system, valence::use_!(r#"In **Gauge permissions**, we **list Account Membership** so the product can show or process the matching set for this workflow. Callers allowed for **Gauge permissions** use the list; it is not a public dump of every field to anonymous visitors."#))
         .where_role(StringPredicate::Equals("owner".to_string()))
         .union(
-            lepton::generated::AccountMembership::query_used(system, valence::use_!("query AccountMembership in gauge/src/super_user.rs; Valence persistence for this feature path; typed store; visible to session actor / service path."))
+            lepton::generated::AccountMembership::query_used(system, valence::use_!(r#"In **Gauge permissions**, we **list Account Membership** so the product can show or process the matching set for this workflow. Callers allowed for **Gauge permissions** use the list; it is not a public dump of every field to anonymous visitors."#))
                 .where_role(StringPredicate::Equals("super_admin".to_string())),
         )
         .await?;
@@ -218,7 +218,7 @@ pub async fn seed_super_user_member_by_email(
     super_group: &PermissionGroup,
     email: &str,
 ) -> anyhow::Result<()> {
-    let email_rows = lepton::generated::AccountEmail::query_used(system, valence::use_!("query AccountEmail in gauge/src/super_user.rs; Valence persistence for this feature path; typed store; visible to session actor / service path."))
+    let email_rows = lepton::generated::AccountEmail::query_used(system, valence::use_!(r#"In **Gauge permissions**, we **list Account Email** so the product can show or process the matching set for this workflow. Callers allowed for **Gauge permissions** use the list; it is not a public dump of every field to anonymous visitors."#))
         .where_address(StringPredicate::Equals(email.to_string()))
         .await?;
     if email_rows.is_empty() {
@@ -228,7 +228,7 @@ pub async fn seed_super_user_member_by_email(
         let Some(email_id) = row.id().cloned() else {
             continue;
         };
-        let Some(user) = lepton::generated::User::query_used(system, valence::use_!("query User in gauge/src/super_user.rs; Valence persistence for this feature path; typed store; visible to session actor / service path."))
+        let Some(user) = lepton::generated::User::query_used(system, valence::use_!(r#"In **Gauge permissions**, we **list User** so the product can show or process the matching set for this workflow. Callers allowed for **Gauge permissions** use the list; it is not a public dump of every field to anonymous visitors."#))
             .where_primary_email(valence::RecordPredicate::Equals(email_id))
             .first()
             .await?
