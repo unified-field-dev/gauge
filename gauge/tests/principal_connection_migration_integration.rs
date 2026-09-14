@@ -272,7 +272,7 @@ async fn super_user_review_queue_hidden_but_direct_approval_allowed() -> anyhow:
     });
 
     // Create super-user group and add "super" as owner/member.
-    let super_group = gauge::generated::PermissionGroup::upsert(
+    let super_group = gauge::generated::PermissionGroup::upsert_used(
         "super_user_group",
         gauge::generated::PermissionGroup::new(
             SUPER_USER_GROUP_NAME.to_string(),
@@ -281,18 +281,20 @@ async fn super_user_review_queue_hidden_but_direct_approval_allowed() -> anyhow:
             Utc::now(),
         )?,
         &system,
+        valence::use_!(r#"**Test:** Fixture **Permission Group** save for `tests` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."#),
     )
     .await?;
-    let super_user = lepton::generated::User::get("super", &system)
+    let super_user = lepton::generated::User::get_used("super", &system, valence::use_!(r#"**Test:** Fixture **User** load for `tests` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."#))
         .await?
         .expect("super user exists");
-    let super_principal = gauge::generated::PermissionUserPrincipal::upsert(
+    let super_principal = gauge::generated::PermissionUserPrincipal::upsert_used(
         "user:super",
         gauge::generated::PermissionUserPrincipal::new(
             super_user.id().expect("super id exists").clone(),
             "super".to_string(),
         )?,
         &system,
+        valence::use_!(r#"**Test:** Fixture **Permission User Principal** save for `tests` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."#),
     )
     .await?;
     super_group
