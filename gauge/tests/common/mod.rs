@@ -207,7 +207,7 @@ pub async fn seed_user_with(id: &str, email: &str, email_verified: bool, valence
         now,
     )
     .expect("build user");
-    let user_created = lepton::generated::User::upsert_used(id, user, valence, valence::use_!(r#"**Test:** Fixture **User** save for `common` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."#))
+    let user_created = lepton::generated::User::upsert_used(id, user, valence, valence::use_!(r"**Test:** Fixture **User** save for `common` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."))
         .await
         .expect("upsert user");
 
@@ -224,7 +224,7 @@ pub async fn seed_user_with(id: &str, email: &str, email_verified: bool, valence
         now,
     )
     .expect("build account");
-    let account_created = lepton::generated::Account::upsert_used(&account_id, account, valence, valence::use_!(r#"**Test:** Fixture **Account** save for `common` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."#))
+    let account_created = lepton::generated::Account::upsert_used(&account_id, account, valence, valence::use_!(r"**Test:** Fixture **Account** save for `common` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."))
         .await
         .expect("upsert account");
     let account_thing = account_created.id().cloned().expect("account id");
@@ -239,13 +239,13 @@ pub async fn seed_user_with(id: &str, email: &str, email_verified: bool, valence
     .expect("build email");
     let email_id_key = format!("email_{id}");
     let email_created =
-        lepton::generated::AccountEmail::upsert_used(&email_id_key, email_row, valence, valence::use_!(r#"**Test:** Fixture **Account Email** save for `common` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."#))
+        lepton::generated::AccountEmail::upsert_used(&email_id_key, email_row, valence, valence::use_!(r"**Test:** Fixture **Account Email** save for `common` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."))
             .await
             .expect("upsert email");
     let email_thing = email_created.id().cloned().expect("email id");
 
     user_created
-        .get_mutable_used(valence, valence::use_!(r#"**Test:** Fixture **this data** access in `mod` so the suite can arrange and assert persistence. CI and developers running the suite only."#))
+        .get_mutable_used(valence, valence::use_!(r"**Test:** Fixture **this data** access in `mod` so the suite can arrange and assert persistence. CI and developers running the suite only."))
         .set_primary_email(email_thing)
         .expect("set user primary email")
         .set_updated_at(now)
@@ -270,11 +270,11 @@ pub async fn seed_super_user_group_with_member(system: &Valence, member_user_id:
     )
     .expect("build super user group");
     let created =
-        gauge::generated::PermissionGroup::upsert_used("super_user_group", super_group, system, valence::use_!(r#"**Test:** Fixture **Permission Group** save for `common` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."#))
+        gauge::generated::PermissionGroup::upsert_used("super_user_group", super_group, system, valence::use_!(r"**Test:** Fixture **Permission Group** save for `common` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."))
             .await
             .expect("upsert super user group");
 
-    let member = lepton::generated::User::get_used(member_user_id, system, valence::use_!(r#"**Test:** Fixture **User** load for `common` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."#))
+    let member = lepton::generated::User::get_used(member_user_id, system, valence::use_!(r"**Test:** Fixture **User** load for `common` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."))
         .await
         .expect("query member user")
         .expect("member user exists");
@@ -286,7 +286,7 @@ pub async fn seed_super_user_group_with_member(system: &Valence, member_user_id:
         )
         .expect("new user principal"),
         system,
-        valence::use_!(r#"**Test:** Fixture **Permission User Principal** save for `common` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."#),
+        valence::use_!(r"**Test:** Fixture **Permission User Principal** save for `common` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."),
     )
     .await
     .expect("upsert user principal");
@@ -320,11 +320,11 @@ pub async fn seed_group_with_owner(
         Utc::now(),
     )
     .expect("build group");
-    let created = gauge::generated::PermissionGroup::upsert_used(group_id, group, system, valence::use_!(r#"**Test:** Fixture **Permission Group** save for `common` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."#))
+    let created = gauge::generated::PermissionGroup::upsert_used(group_id, group, system, valence::use_!(r"**Test:** Fixture **Permission Group** save for `common` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."))
         .await
         .expect("upsert group");
 
-    let owner = lepton::generated::User::get_used(owner_user_id, system, valence::use_!(r#"**Test:** Fixture **User** load for `common` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."#))
+    let owner = lepton::generated::User::get_used(owner_user_id, system, valence::use_!(r"**Test:** Fixture **User** load for `common` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."))
         .await
         .expect("query owner")
         .expect("owner exists");
@@ -336,7 +336,7 @@ pub async fn seed_group_with_owner(
         )
         .expect("new principal"),
         system,
-        valence::use_!(r#"**Test:** Fixture **Permission User Principal** save for `common` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."#),
+        valence::use_!(r"**Test:** Fixture **Permission User Principal** save for `common` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."),
     )
     .await
     .expect("upsert principal");
@@ -366,7 +366,7 @@ pub async fn seed_membership(
         Utc::now(),
     )
     .expect("build account");
-    lepton::generated::Account::upsert_used(account_id, account, v, valence::use_!(r#"**Test:** Fixture **Account** save for `common` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."#))
+    lepton::generated::Account::upsert_used(account_id, account, v, valence::use_!(r"**Test:** Fixture **Account** save for `common` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."))
         .await
         .expect("upsert account");
 
@@ -378,7 +378,7 @@ pub async fn seed_membership(
         Utc::now(),
     )
     .expect("build membership");
-    lepton::generated::AccountMembership::upsert_used(id, membership, v, valence::use_!(r#"**Test:** Fixture **Account Membership** save for `common` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."#))
+    lepton::generated::AccountMembership::upsert_used(id, membership, v, valence::use_!(r"**Test:** Fixture **Account Membership** save for `common` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."))
         .await
         .expect("upsert membership");
 }
