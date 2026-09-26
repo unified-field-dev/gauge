@@ -8,6 +8,9 @@ ignore = [
     { id = "RUSTSEC-2025-0141", reason = "bincode unmaintained; transitive via surrealmx -> surrealdb-core (surreal backend)" },
     { id = "RUSTSEC-2024-0436", reason = "paste unmaintained; transitive via leptos (either_of)" },
     { id = "RUSTSEC-2026-0173", reason = "proc-macro-error2 unmaintained; transitive via leptos_macro" },
+    # quick-xml <0.41 pinned by object_store 0.13 via surrealdb-core; no bump until surrealdb moves.
+    { id = "RUSTSEC-2026-0194", reason = "quick-xml quadratic attr check; transitive via surrealdb -> object_store; upgrade blocked" },
+    { id = "RUSTSEC-2026-0195", reason = "quick-xml NsReader DoS; transitive via surrealdb -> object_store; upgrade blocked" },
 ]
 
 [licenses]

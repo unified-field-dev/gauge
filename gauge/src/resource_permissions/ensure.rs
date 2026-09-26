@@ -102,7 +102,7 @@ async fn add_owner_user(
             anyhow::anyhow!("principal id missing"),
         )
     })?;
-    match group.relate_to_owner_record(&pid, system, valence::use_!(r#"When an operator **adds a group owner** in **Gauge**, we **write the owner edge** from the permission group to that principal so later checks know who can approve and edit. Operators see the updated owners on the group detail."#)).await {
+    match group.relate_to_owner_record(&pid, system, valence::use_!(r"When an operator **adds a group owner** in **Gauge**, we **write the owner edge** from the permission group to that principal so later checks know who can approve and edit. Operators see the updated owners on the group detail.")).await {
         Ok(()) => Ok(()),
         Err(e) => {
             let msg = e.to_string();
@@ -455,7 +455,7 @@ async fn delete_entity_now(
     let backend = system
         .backend_for_table(table)
         .map_err(|e| map_err(kind, resource_id, operation, e))?;
-    match valence::delete_record(backend.as_ref(), table, bare, valence::use_!(r#"When **Gauge** finishes tearing down a **resource permission bundle**, we **delete the leftover group or table row** from storage so cleanup completes. Operators and resource teardown use this path."#)).await {
+    match valence::delete_record(backend.as_ref(), table, bare, valence::use_!(r"When **Gauge** finishes tearing down a **resource permission bundle**, we **delete the leftover group or table row** from storage so cleanup completes. Operators and resource teardown use this path.")).await {
         Ok(()) | Err(valence::Error::NotFound(_)) => {}
         Err(e) => return Err(map_err(kind, resource_id, operation, e)),
     }
@@ -480,7 +480,7 @@ async fn delete_permission_group_row(
         "permission_group",
         record_id,
         system,
-        valence::use_!(r#"When Gauge finishes removing owners and members from a **permission group**, we **load that group row once** to see whether it still exists before deleting it. The app uses this only to decide whether cleanup should continue; the row is not shown to a user on this path."#),
+        valence::use_!(r"When Gauge finishes removing owners and members from a **permission group**, we **load that group row once** to see whether it still exists before deleting it. The app uses this only to decide whether cleanup should continue; the row is not shown to a user on this path."),
     )
     .await
     .map_err(|e| map_err(kind, resource_id, "delete_owners_group", e))?
@@ -502,7 +502,7 @@ async fn delete_permission_group_row(
             .map_err(|e| map_err(kind, resource_id, "delete_owners_group", e))?
         {
             system
-                .unrelate_edge(edge, &endpoint, &to, valence::use_!(r#"When **Gauge** tears down a **permission group**, we **remove its owner and member edges** before deleting the group row so no orphaned links remain. Cleanup uses this only."#))
+                .unrelate_edge(edge, &endpoint, &to, valence::use_!(r"When **Gauge** tears down a **permission group**, we **remove its owner and member edges** before deleting the group row so no orphaned links remain. Cleanup uses this only."))
                 .await
                 .map_err(|e| map_err(kind, resource_id, "delete_owners_group", e))?;
         }
@@ -512,12 +512,12 @@ async fn delete_permission_group_row(
             .map_err(|e| map_err(kind, resource_id, "delete_owners_group", e))?
         {
             system
-                .unrelate_edge(edge, &from, &endpoint, valence::use_!(r#"When **Gauge** tears down a **permission group**, we **remove its owner and member edges** before deleting the group row so no orphaned links remain. Cleanup uses this only."#))
+                .unrelate_edge(edge, &from, &endpoint, valence::use_!(r"When **Gauge** tears down a **permission group**, we **remove its owner and member edges** before deleting the group row so no orphaned links remain. Cleanup uses this only."))
                 .await
                 .map_err(|e| map_err(kind, resource_id, "delete_owners_group", e))?;
         }
     }
-    valence::delete_record(backend.as_ref(), "permission_group", record_id, valence::use_!(r#"When **Gauge** finishes tearing down a **resource permission bundle**, we **delete the leftover group or table row** from storage so cleanup completes. Operators and resource teardown use this path."#))
+    valence::delete_record(backend.as_ref(), "permission_group", record_id, valence::use_!(r"When **Gauge** finishes tearing down a **resource permission bundle**, we **delete the leftover group or table row** from storage so cleanup completes. Operators and resource teardown use this path."))
         .await
         .map_err(|e| map_err(kind, resource_id, "delete_owners_group", e))?;
     valence::read_cache::invalidate("permission_group", record_id);

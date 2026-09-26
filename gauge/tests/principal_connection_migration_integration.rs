@@ -38,7 +38,7 @@ async fn edge_count(v: &Valence, edge_table: &str, from: &str, to: &str) -> anyh
     let from_record = parse_record(from)?;
     let to_record = parse_record(to)?;
     let targets = v
-        .get_many_to_many_target_record_ids(&from_record, edge_table, valence::use_!(r#"**Test:** Fixture legacy edge target list for `principal_connection_migration_integration` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."#))
+        .get_many_to_many_target_record_ids(&from_record, edge_table, valence::use_!(r"**Test:** Fixture legacy edge target list for `principal_connection_migration_integration` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."))
         .await
         .map_err(|e| anyhow::anyhow!("{e}"))?;
     Ok(targets
@@ -99,7 +99,7 @@ async fn migration_script_backfills_principal_edges_idempotently() -> anyhow::Re
             "permission_group_member_user",
             &RecordId::new("permission_group", group_id.as_str()),
             &RecordId::new("user", "member"),
-        valence::use_!(r#"**Test:** Fixture edge relate for `principal_connection_migration_integration` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."#),
+        valence::use_!(r"**Test:** Fixture edge relate for `principal_connection_migration_integration` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."),
     )
         .await?;
     system
@@ -107,7 +107,7 @@ async fn migration_script_backfills_principal_edges_idempotently() -> anyhow::Re
             "permission_group_owner_user",
             &RecordId::new("permission_group", group_id.as_str()),
             &RecordId::new("user", "owner"),
-        valence::use_!(r#"**Test:** Fixture edge relate for `principal_connection_migration_integration` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."#),
+        valence::use_!(r"**Test:** Fixture edge relate for `principal_connection_migration_integration` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."),
     )
         .await?;
     system
@@ -115,7 +115,7 @@ async fn migration_script_backfills_principal_edges_idempotently() -> anyhow::Re
             "permission_allowed_user",
             &RecordId::new("permission", permission_id.as_str()),
             &RecordId::new("user", "member"),
-        valence::use_!(r#"**Test:** Fixture edge relate for `principal_connection_migration_integration` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."#),
+        valence::use_!(r"**Test:** Fixture edge relate for `principal_connection_migration_integration` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."),
     )
         .await?;
 
@@ -222,7 +222,7 @@ async fn migration_fails_when_legacy_user_edge_targets_missing_user_sad() -> any
             "permission_allowed_user",
             &RecordId::new("permission", permission_id.as_str()),
             &RecordId::new("user", "ghost_missing_user"),
-        valence::use_!(r#"**Test:** Fixture edge relate for `principal_connection_migration_integration` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."#),
+        valence::use_!(r"**Test:** Fixture edge relate for `principal_connection_migration_integration` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."),
     )
         .await?;
 
@@ -284,10 +284,10 @@ async fn seed_super_user_group(system: &Valence) -> anyhow::Result<()> {
     )
     .await?;
     super_group
-        .relate_to_owner_record(super_principal.id().expect("principal id exists"), system, valence::use_!(r#"**Test:** Fixture owner-edge relate for `principal_connection_migration_integration` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."#))
+        .relate_to_owner_record(super_principal.id().expect("principal id exists"), system, valence::use_!(r"**Test:** Fixture owner-edge relate for `principal_connection_migration_integration` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."))
         .await?;
     super_group
-        .relate_to_member_record(super_principal.id().expect("principal id exists"), system, valence::use_!(r#"**Test:** Fixture member-edge relate for `principal_connection_migration_integration` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."#))
+        .relate_to_member_record(super_principal.id().expect("principal id exists"), system, valence::use_!(r"**Test:** Fixture member-edge relate for `principal_connection_migration_integration` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."))
         .await?;
     Ok(())
 }

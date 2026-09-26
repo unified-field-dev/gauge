@@ -135,7 +135,7 @@ async fn permission_group_policy_allows_owner_denies_non_owner_tm_sec_01_02() ->
         "permission_group",
         group_id,
         &system,
-        valence::use_!(r#"**Test:** Fixture row load for `privacy_policy_integration` so the suite can assert Valence privacy policy allow and deny outcomes. CI and developers running the suite only."#),
+        valence::use_!(r"**Test:** Fixture row load for `privacy_policy_integration` so the suite can assert Valence privacy policy allow and deny outcomes. CI and developers running the suite only."),
     )
     .await?
     .expect("group record");
@@ -239,7 +239,7 @@ async fn permission_policy_enforces_model_mutation_paths_tm_sec_01_02() -> anyho
         "permission",
         "perm_policy_2",
         &system,
-        valence::use_!(r#"**Test:** Fixture row load for `privacy_policy_integration` so the suite can assert Valence privacy policy allow and deny outcomes. CI and developers running the suite only."#),
+        valence::use_!(r"**Test:** Fixture row load for `privacy_policy_integration` so the suite can assert Valence privacy policy allow and deny outcomes. CI and developers running the suite only."),
     )
     .await?
     .expect("permission record");
@@ -360,7 +360,7 @@ async fn permission_history_update_delete_peer_denied_owner_allowed() -> anyhow:
         "permission_history",
         record_id,
         &system,
-        valence::use_!(r#"**Test:** Fixture row load for `privacy_policy_integration` so the suite can assert Valence privacy policy allow and deny outcomes. CI and developers running the suite only."#),
+        valence::use_!(r"**Test:** Fixture row load for `privacy_policy_integration` so the suite can assert Valence privacy policy allow and deny outcomes. CI and developers running the suite only."),
     )
     .await?
     .expect("history record exists");
@@ -450,7 +450,7 @@ async fn super_user_can_update_delete_permission_history_via_parent_happy() -> a
         "permission_history",
         record_id,
         &system,
-        valence::use_!(r#"**Test:** Fixture row load for `privacy_policy_integration` so the suite can assert Valence privacy policy allow and deny outcomes. CI and developers running the suite only."#),
+        valence::use_!(r"**Test:** Fixture row load for `privacy_policy_integration` so the suite can assert Valence privacy policy allow and deny outcomes. CI and developers running the suite only."),
     )
     .await?
     .expect("history record exists");
@@ -501,7 +501,7 @@ async fn permission_request_update_maintainer_only_tm_sec_05() -> anyhow::Result
         "permission_request",
         &request.id,
         &system,
-        valence::use_!(r#"**Test:** Fixture row load for `privacy_policy_integration` so the suite can assert Valence privacy policy allow and deny outcomes. CI and developers running the suite only."#),
+        valence::use_!(r"**Test:** Fixture row load for `privacy_policy_integration` so the suite can assert Valence privacy policy allow and deny outcomes. CI and developers running the suite only."),
     )
     .await?
     .expect("request record");
@@ -572,7 +572,7 @@ async fn permission_history_read_defers_to_parent_read_tm_sec_04() -> anyhow::Re
         "permission_history",
         record_id,
         &system,
-        valence::use_!(r#"**Test:** Fixture row load for `privacy_policy_integration` so the suite can assert Valence privacy policy allow and deny outcomes. CI and developers running the suite only."#),
+        valence::use_!(r"**Test:** Fixture row load for `privacy_policy_integration` so the suite can assert Valence privacy policy allow and deny outcomes. CI and developers running the suite only."),
     )
     .await?
     .expect("history record exists");
@@ -601,7 +601,7 @@ async fn session_owner_walk_reads_principals_without_system_tm_sec_08() -> anyho
         "permission_group",
         group_id,
         &system,
-        valence::use_!(r#"**Test:** Fixture row load for `privacy_policy_integration` so the suite can assert Valence privacy policy allow and deny outcomes. CI and developers running the suite only."#),
+        valence::use_!(r"**Test:** Fixture row load for `privacy_policy_integration` so the suite can assert Valence privacy policy allow and deny outcomes. CI and developers running the suite only."),
     )
     .await?
     .expect("group");
@@ -613,7 +613,7 @@ async fn session_owner_walk_reads_principals_without_system_tm_sec_08() -> anyho
     let group = PermissionGroup::get(group_id, &owner_v, valence::use_!(r"**Test:** Fixture **Permission Group** load for `tests` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."))
         .await?
         .expect("session get group");
-    let owners = group.get_owners_record_ids(&owner_v, valence::use_!(r#"**Test:** Fixture owners edge list for `privacy_policy_integration` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."#)).await?;
+    let owners = group.get_owners_record_ids(&owner_v, valence::use_!(r"**Test:** Fixture owners edge list for `privacy_policy_integration` so the suite can arrange and assert persistence behavior. CI and developers running the suite only.")).await?;
     assert!(
         !owners.is_empty(),
         "session actor must resolve owner principal edges without System elevate"
