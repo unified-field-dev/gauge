@@ -95,7 +95,10 @@ mod spec;
 
 pub use actor_id::ActorId;
 pub use default_groups::{seed_resource_kind_catalog, KindDefaultGroups};
-pub use ensure::{delete_resource_permission_bundle, ensure_resource_permission_bundle};
+pub use ensure::{
+    delete_resource_permission_bundle, ensure_resource_permission_bundle,
+    ensure_resource_permission_bundle_for_group,
+};
 pub use error::ResourcePermissionError;
 pub use kinds::{
     domain_id, normalize_id_fragment, owners_group_id, permission_name, permission_record_id,
