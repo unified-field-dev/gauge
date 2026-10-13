@@ -475,7 +475,9 @@ where
             &kind,
             &resource_id,
             "requires_system_actor",
-            anyhow::anyhow!("group-owned bundles are control-plane seeds and need a System Valence"),
+            anyhow::anyhow!(
+                "group-owned bundles are control-plane seeds and need a System Valence"
+            ),
         ));
     }
     if PermissionGroup::get(grant_group_id, system, valence::use_!(r"When a **host seeds a resource permission bundle for a group**, we **load that group** to confirm it exists before granting it access, so the grant never points at a missing group. Used only during host boot."))

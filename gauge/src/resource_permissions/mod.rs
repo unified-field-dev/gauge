@@ -94,7 +94,9 @@ mod revoke_umbrella_grants;
 mod spec;
 
 pub use actor_id::ActorId;
-pub use default_groups::{seed_resource_kind_catalog, KindDefaultGroups};
+pub use default_groups::{
+    ensure_group_granted_permission, seed_resource_kind_catalog, KindDefaultGroups,
+};
 pub use ensure::{
     delete_resource_permission_bundle, ensure_resource_permission_bundle,
     ensure_resource_permission_bundle_for_group,
